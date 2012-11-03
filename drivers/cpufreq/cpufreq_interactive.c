@@ -148,6 +148,7 @@ static unsigned int cpufreq_interactive_get_target(
 	struct cpufreq_interactive_cpuinfo *pcpu)
 {
 	unsigned int target_freq;
+	u64 now = ktime_to_us(ktime_get());
 
 	/*
 	 * Choose greater of short-term load (since last idle timer

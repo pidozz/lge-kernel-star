@@ -102,7 +102,7 @@ static unsigned long min_sample_time;
  * Wait this long before raising speed above hispeed, by default a single
  * timer interval.
  */
-#define DEFAULT_ABOVE_HISPEED_DELAY DEFAULT_TIMER_RATE
+#define DEFAULT_ABOVE_HISPEED_DELAY 20000;
 static unsigned long above_hispeed_delay_val;
 
 /*
@@ -973,7 +973,7 @@ static int cpufreq_governor_interactive(struct cpufreq_policy *new_policy,
 		smp_wmb();
 
 		if (!hispeed_freq)
-			hispeed_freq = policy->max;
+			hispeed_freq = new_policy->max;
 
 		/*
 		 * Do not register the idle hook and create sysfs

@@ -87,7 +87,7 @@ unsigned long tegra_fb_size;
 unsigned long tegra_fb2_start;
 unsigned long tegra_fb2_size;
 unsigned long tegra_carveout_start;
-unsigned long tegra_carveout_size;
+unsigned long tegra_carveout_size = 0;
 unsigned long tegra_vpr_start;
 unsigned long tegra_vpr_size;
 unsigned long tegra_lp0_vec_start;
@@ -484,6 +484,17 @@ static int __init tegra_bootloader_fb_arg(char *options)
 }
 early_param("tegra_fbmem", tegra_bootloader_fb_arg);
 
+static int __init tegra_carveout(char *options)
+{
+	char *p = options;
+
+	tegra_carveout_size = memparse(p, &p);
+	pr_info("Found carveout: size=%08lx\n", tegra_carveout_size);
+
+	return 0;
+}
+early_param("carveout", tegra_carveout);
+
 static int __init tegra_sku_override(char *id)
 {
 	char *p = id;
@@ -792,6 +803,10 @@ void __init tegra_reserve(unsigned long carveout_size, unsigned long fb_size,
 #endif
 
 	if (carveout_size) {
+		if (tegra_carveout_size > 0) {
+			pr_info("override carveout size=%08lx\n", tegra_carveout_size);
+			carveout_size = tegra_carveout_size;
+		}
 		tegra_carveout_start = memblock_end_of_DRAM() - carveout_size;
 		if (memblock_remove(tegra_carveout_start, carveout_size)) {
 			pr_err("Failed to remove carveout %08lx@%08lx "

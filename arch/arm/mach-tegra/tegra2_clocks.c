@@ -2684,6 +2684,7 @@ static struct cpufreq_frequency_table freq_table_750MHz[] = {
 	{ 5, CPUFREQ_TABLE_END },
 };
 
+
 static struct cpufreq_frequency_table freq_table_1p0GHz[] = {
 	{ 0, 216000 },
 	{ 1, 312000 },
@@ -2691,8 +2692,13 @@ static struct cpufreq_frequency_table freq_table_1p0GHz[] = {
 	{ 3, 608000 },
 	{ 4, 760000 },
 	{ 5, 816000 },
+#ifdef CONFIG_PIDOZZ_OC
 	{ 6, 1000000 },
 	{ 7, 1200000 },
+#else
+	{ 6, 912000 },
+	{ 7, 1000000 },
+#endif
 	{ 8, CPUFREQ_TABLE_END },
 };
 

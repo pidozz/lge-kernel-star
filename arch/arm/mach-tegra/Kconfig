@@ -261,10 +261,6 @@ config TEGRA_SYSTEM_DMA
 	  Adds system DMA functionality for NVIDIA Tegra SoCs, used by
 	  several Tegra device drivers
 
-config PIDOZZ_OC
-	bool "Enable 1.2 overclocking ala DRH"
-	default n
-
 config TEGRA_PWM
 	tristate "Enable PWM driver"
 	select HAVE_PWM
@@ -304,7 +300,7 @@ config TEGRA_CORE_DVFS
 config TEGRA_OC
 	bool "Tegra2 Overclocking Enable"
 	depends on TEGRA_CPU_DVFS && TEGRA_CORE_DVFS
-	default y
+	default n
 
 config TEGRA_IOVMM_GART
 	bool "Enable I/O virtual memory manager for GART"

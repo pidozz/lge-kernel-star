@@ -2158,11 +2158,7 @@ static struct clk tegra_clk_cclk = {
 	.inputs	= mux_cclk,
 	.reg	= 0x20,
 	.ops	= &tegra_super_ops,
-#ifdef CONFIG_PIDOZZ_OC
-	.max_rate = 1200000000,
-#else
 	.max_rate = 1000000000,
-#endif
 };
 
 static struct clk tegra_clk_sclk = {
@@ -2178,11 +2174,7 @@ static struct clk tegra_clk_virtual_cpu = {
 	.name      = "cpu",
 	.parent    = &tegra_clk_cclk,
 	.ops       = &tegra_cpu_ops,
-#ifdef CONFIG_PIDOZZ_OC
-	.max_rate = 1200000000,
-#else
-	.max_rate = 1000000000,
-#endif
+	.max_rate  = 1000000000,
 	.u.cpu = {
 		.main      = &tegra_pll_x,
 		.backup    = &tegra_pll_p,
@@ -2598,16 +2590,9 @@ static struct tegra_sku_rate_limit sku_limits[] =
 	RATE_LIMIT("cclk",	750000000, 0x07, 0x10),
 	RATE_LIMIT("pll_x",	750000000, 0x07, 0x10),
 
-#ifdef CONFIG_PIDOZZ_OC
-	RATE_LIMIT("cpu",	1200000000, 0x04, 0x08, 0x0F),
-	RATE_LIMIT("cclk",	1200000000, 0x04, 0x08, 0x0F),
-	RATE_LIMIT("pll_x",	1200000000, 0x04, 0x08, 0x0F),
-#else
-
 	RATE_LIMIT("cpu",	1000000000, 0x04, 0x08, 0x0F),
 	RATE_LIMIT("cclk",	1000000000, 0x04, 0x08, 0x0F),
 	RATE_LIMIT("pll_x",	1000000000, 0x04, 0x08, 0x0F),
-#endif
 
 	RATE_LIMIT("cpu",	1200000000, 0x14, 0x17, 0x18, 0x1B, 0x1C),
 	RATE_LIMIT("cclk",	1200000000, 0x14, 0x17, 0x18, 0x1B, 0x1C),
@@ -2692,13 +2677,8 @@ static struct cpufreq_frequency_table freq_table_1p0GHz[] = {
 	{ 3, 608000 },
 	{ 4, 760000 },
 	{ 5, 816000 },
-#ifdef CONFIG_PIDOZZ_OC
-	{ 6, 1000000 },
-	{ 7, 1200000 },
-#else
 	{ 6, 912000 },
 	{ 7, 1000000 },
-#endif
 	{ 8, CPUFREQ_TABLE_END },
 };
 

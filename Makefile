@@ -344,8 +344,8 @@ MODFLAGS  	= -DMODULE -O2 -mtune=cortex-a9 -march=armv7-a -mthumb-interwork -mfp
 CFLAGS_MODULE   = 
 AFLAGS_MODULE   = 
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -O3 -fgcse-sm -mfpu=vfpv3-d16 -fno-tree-vectorize -marm
-AFLAGS_KERNEL	= -O3 -fgcse-sm -mfpu=vfpv3-d16 -fno-tree-vectorize -marm
+CFLAGS_KERNEL	= -mfpu=vfpv3-d16
+AFLAGS_KERNEL	= -mfpu=vfpv3-d16
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
@@ -547,7 +547,7 @@ all: vmlinux
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os
 else
-KBUILD_CFLAGS	+= -O3
+KBUILD_CFLAGS	+= -O2
 endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile

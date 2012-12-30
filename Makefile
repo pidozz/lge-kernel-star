@@ -193,7 +193,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= $(SUBARCH)
-CROSS_COMPILE	?= $(HOME)/cm10/prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
+CROSS_COMPILE	?= $(HOME)/cm10/prebuilt/linux-x86/toolchain/arm-symbi0sis-linux-gnueabi/bin/arm-symbi0sis-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -340,12 +340,11 @@ CHECK		= sparse
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 
-MODFLAGS  	= -DMODULE -O3 -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -ftree-vectorize -mfpu=vfpv3-d16 -ffast-math
-CFLAGS_MODULE   = 
-AFLAGS_MODULE   = 
+CFLAGS_MODULE   = -DMODULE
+AFLAGS_MODULE   = -DMODULE
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -mfpu=vfpv3-d16 -ffast-math
-AFLAGS_KERNEL	= -mfpu=vfpv3-d16 -ffast-math
+CFLAGS_KERNEL	= -mfpu=vfpv3-d16 -ffast-math -fno-inline-functions -mtune=cortex-a9
+AFLAGS_KERNEL	= 
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 # Use LINUXINCLUDE when you must reference the include/ directory.

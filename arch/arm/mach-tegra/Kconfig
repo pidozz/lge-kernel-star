@@ -302,6 +302,11 @@ config TEGRA_OC
 	depends on TEGRA_CPU_DVFS && TEGRA_CORE_DVFS
 	default n
 
+config PIDOZZ_OC
+	bool "Tegra2 Pidozz Overclocking Enable"
+	depends on TEGRA_CPU_DVFS && TEGRA_CORE_DVFS
+	default n
+
 config TEGRA_IOVMM_GART
 	bool "Enable I/O virtual memory manager for GART"
 	depends on ARCH_TEGRA_2x_SOC

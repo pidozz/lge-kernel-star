@@ -1,7 +1,7 @@
 #
 # Automatically generated make config: don't edit
 # Linux/arm 2.6.39.4 Kernel Configuration
-# Sat Dec 29 00:38:33 2012
+# Wed Jan  2 15:15:28 2013
 #
 CONFIG_ARM=y
 CONFIG_HAVE_PWM=y
@@ -404,6 +404,7 @@ CONFIG_TEGRA_EMC_SCALING_ENABLE=y
 CONFIG_TEGRA_CPU_DVFS=y
 CONFIG_TEGRA_CORE_DVFS=y
 # CONFIG_TEGRA_OC is not set
+# CONFIG_PIDOZZ_OC is not set
 CONFIG_TEGRA_IOVMM_GART=y
 CONFIG_TEGRA_IOVMM=y
 CONFIG_TEGRA_AVP_KERNEL_ON_MMU=y
@@ -548,7 +549,7 @@ CONFIG_ALIGNMENT_TRAP=y
 #
 CONFIG_ZBOOT_ROM_TEXT=0x0
 CONFIG_ZBOOT_ROM_BSS=0x0
-CONFIG_CMDLINE="loglevel=0 muic_state=1 CRC=30003001cf698c7 brdrev=1.0 uniqueid=280408442e0b1d7 video=tegrafb console=ttyS0,115200n8 usbcore.old_scheme_first=1 tegraboot=sdmmc tegrapart=recovery:35e00:2800:800,linux:34700:1000:800,mbr:400:200:800,system:600:2bc00:800,cache:2c200:8000:800,misc:34200:400:800,userdata:38700:c0000:800 de=normal androidboot.hardware=star androidboot.serialno=37c7006421f6097   mem=512M@0M vmalloc=128M carveout=152M androidboot.mode=normal androidboot.hardware=star androidboot.serialno=280408442e0b1d7"
+CONFIG_CMDLINE="loglevel=0 muic_state=1 CRC=30003001cf698c7 brdrev=1.0 uniqueid=280408442e0b1d7 video=tegrafb console=ttyS0,115200n8 usbcore.old_scheme_first=1 tegraboot=sdmmc tegrapart=recovery:35e00:2800:800,linux:34700:1000:800,mbr:400:200:800,system:600:2bc00:800,cache:2c200:8000:800,misc:34200:400:800,userdata:38700:c0000:800 de=normal androidboot.hardware=star androidboot.serialno=37c7006421f6097   mem=512M@0M vmalloc=128M carveout=104M androidboot.mode=normal androidboot.hardware=star androidboot.serialno=280408442e0b1d7"
 # CONFIG_CMDLINE_FORCE is not set
 # CONFIG_XIP_KERNEL is not set
 # CONFIG_KEXEC is not set

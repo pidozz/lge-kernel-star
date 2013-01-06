@@ -56,8 +56,6 @@ u64 freq_boosted_time;
 #define MIN_SAMPLING_RATE_RATIO			(2)
 
 static unsigned int min_sampling_rate;
-unsigned int tick = 0;
-
 
 #define LATENCY_MULTIPLIER			(1000)
 #define MIN_LATENCY_MULTIPLIER			(100)
@@ -550,39 +548,6 @@ static struct attribute_group dbs_attr_group = {
 
 /************************** sysfs end ************************/
 
-static void hotplug(struct cpu_dbs_info_s *this_dbs_info, unsigned int load) {
-	struct cpufreq_policy *policy;
-	unsigned long min_cur;
-	policy = this_dbs_info->cur_policy;
-	min_cur = policy->min;
-	tick = 0;
-
-	if (load <= 20) {
-		if (!cpu_online(1))
-			return;
-		cpu_down(1);
-		
-		/*
-		 * when cpu1 is down -> min cpu freq = 456mhz
-		 * more power angry, more smoother		
-		 */		
-		//if (min_cur < 456000)
-		//	policy->min = 456000;
-	}
-
-
-	if (load > 65) {
-		if (!cpu_online(1))
-			cpu_up(1);
-
-		/*
-		 * when cpu1 is up and min cpu freq = 456mhz -> min cpu freq = 216mhz		
-		 */	
-		//if (min_cur == 456000)
-		//	policy->min = 216000;
-	}
-}
-
 static void dbs_freq_increase(struct cpufreq_policy *p, unsigned int freq)
 {
 	if (dbs_tuners_ins.powersave_bias)
@@ -629,7 +594,6 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 
 	/* Get Absolute Load - in terms of freq */
 	max_load_freq = 0;
-	tick += HZ;
 
 	for_each_cpu(j, policy->cpus) {
 		struct cpu_dbs_info_s *j_dbs_info;
@@ -694,10 +658,6 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		load_freq = load * freq_avg;
 		if (load_freq > max_load_freq)
 			max_load_freq = load_freq;
-
-		if(tick > (HZ*5))
-			hotplug(this_dbs_info, load);
-
 	}
 
 	/* Check for frequency increase */

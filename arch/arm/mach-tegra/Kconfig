@@ -302,8 +302,8 @@ config TEGRA_OC
 	depends on TEGRA_CPU_DVFS && TEGRA_CORE_DVFS
 	default n
 
-config PIDOZZ_OC
-	bool "Tegra2 Pidozz Overclocking Enable"
+config TEGRA_UVOV
+	bool "Tegra2 Under/Overvolting Enable"
 	depends on TEGRA_CPU_DVFS && TEGRA_CORE_DVFS
 	default n
 

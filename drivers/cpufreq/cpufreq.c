@@ -33,14 +33,31 @@
 
 #include <trace/events/power.h>
 
-#ifdef CONFIG_TEGRA_UVOV
-#include "../dvfs.h"
-int *UV_mV_Ptr; /* Stored voltage table from cpufreq sysfs */
-extern struct dvfs *cpu_dvfs;
-#endif
-
 #define dprintk(msg...) cpufreq_debug_printk(CPUFREQ_DEBUG_CORE, \
 						"cpufreq-core", msg)
+
+/* Initial implementation of userspace voltage control */
+#ifdef CONFIG_TEGRA_MAX
+	#define FREQCOUNT 12
+#else
+	#define FREQCOUNT 10
+#endif
+
+#define CPUMVMAX 1400
+#define CPUMVMIN 770
+
+#ifdef CONFIG_TEGRA_MAX
+int cpufrequency[FREQCOUNT] = { 1408000, 1300000, 1200000, 1000000, 912000, 816000, 760000, 750000, 608000, 456000, 312000, 216000 };
+#else
+int cpufrequency[FREQCOUNT] = { 1200000, 1000000, 912000, 816000, 760000, 750000, 608000, 456000, 312000, 216000 };
+#endif
+
+#ifdef CONFIG_TEGRA_MAX
+int cpuvoltage[FREQCOUNT] = { 1325, 1250, 1175, 1000, 950, 925, 900, 900, 875, 825, 775, 750 };
+#else
+int cpuvoltage[FREQCOUNT] = { 1175, 1000, 950, 925, 900, 900, 875, 825, 775, 750 };
+#endif
+int cpuuvoffset[FREQCOUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**
  * The "cpufreq driver" - the arch- or hardware-dependent low
@@ -539,9 +556,6 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 	unsigned int ret = -EINVAL;
 	char	str_governor[16];
 	struct cpufreq_policy new_policy;
-	char *envp[3];
-	char buf1[64];
-	char buf2[64];
 
 	ret = cpufreq_get_policy(&new_policy, policy->cpu);
 	if (ret)
@@ -561,13 +575,6 @@ static ssize_t store_scaling_governor(struct cpufreq_policy *policy,
 
 	policy->user_policy.policy = policy->policy;
 	policy->user_policy.governor = policy->governor;
-
-	snprintf(buf1, sizeof(buf1), "GOV=%s", policy->governor->name);
-	snprintf(buf2, sizeof(buf2), "CPU=%u", policy->cpu);
-	envp[0] = buf1;
-	envp[1] = buf2;
-	envp[2] = NULL;
-	kobject_uevent_env(cpufreq_global_kobject, KOBJ_ADD, envp);
 
 	if (ret)
 		return ret;
@@ -684,63 +691,58 @@ static ssize_t show_bios_limit(struct cpufreq_policy *policy, char *buf)
 	return sprintf(buf, "%u\n", policy->cpuinfo.max_freq);
 }
 
-#ifdef CONFIG_TEGRA_UVOV
+/* Undervolt support, also for stock*/
 static ssize_t show_frequency_voltage_table(struct cpufreq_policy *policy, char *buf)
 {
-	int i = 0;
 	char *table = buf;
-
-	if (cpu_dvfs == NULL)
-		return sprintf(buf, "INIT\n");
-
-	for (i = cpu_dvfs->num_freqs-1; i >= 0; i--)
-		table += sprintf(table, "%li %d %d\n", cpu_dvfs->freqs[i]/1000,
-				cpu_dvfs->millivolts[i], cpu_dvfs->millivolts[i] - UV_mV_Ptr[i]);
-
+	int i;
+	for (i = 0; i < FREQCOUNT; i++)
+		table += sprintf(table, "%d %d %d\n", cpufrequency[i], cpuvoltage[i], (cpuvoltage[i]-cpuuvoffset[i]));
 	return table - buf;
 }
-
 static ssize_t show_UV_mV_table(struct cpufreq_policy *policy, char *buf)
 {
-	int i;
 	char *table = buf;
+	int i;
 
-	if (cpu_dvfs == NULL)
-		return sprintf(buf, "INIT\n");
+	table += sprintf(table, "%d", cpuuvoffset[0]);
 
-	for (i = cpu_dvfs->num_freqs - 1; i >= 0; i--) {
-		table += sprintf(table, "%d ", UV_mV_Ptr[i]);
+	for (i = 1; i < FREQCOUNT - 1; i++){
+	table += sprintf(table, " %d", cpuuvoffset[i]);
 	}
-	table += sprintf(table, "\n");
+	table += sprintf(table, " %d\n", cpuuvoffset[FREQCOUNT - 1]);
+
 	return table - buf;
 }
-
-static ssize_t store_UV_mV_table(struct cpufreq_policy *policy, const char *buf, size_t count)
+static ssize_t show_cpuinfo_max_mV(struct cpufreq_policy *policy, char *buf)
 {
-	char *p = buf, *k;
-        int i = cpu_dvfs->num_freqs - 1;
-
-	while (i >= 0) {
-		k = strsep(&p, " ");
-		if (k == NULL)
-			break;
-		if (strlen(k) > 0) {
-			UV_mV_Ptr[i] = simple_strtol(k, NULL, 10);
-			pr_info("UV_mV[%d] = %d\n", i, UV_mV_Ptr[i]);
-			i--;
-		}
-	}
-
-	if (i == cpu_dvfs->num_freqs - 1)
+	sprintf(buf, "%u\n", CPUMVMAX);
+}
+static ssize_t show_cpuinfo_min_mV(struct cpufreq_policy *policy, char *buf)
+{
+	sprintf(buf, "%u\n", CPUMVMIN);
+}
+static ssize_t store_UV_mV_table(struct cpufreq_policy *policy, char *buf, size_t count)
+{
+	int tmptable[FREQCOUNT];
+	int i;
+	unsigned int ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d", &tmptable[0], &tmptable[1], &tmptable[2], &tmptable[3], &tmptable[4], &tmptable[5], &tmptable[6], &tmptable[7], &tmptable[8], &tmptable[9], &tmptable[10], &tmptable[11], &tmptable[12]);
+	if (ret != FREQCOUNT)
 		return -EINVAL;
-
+	for (i = 0; i < FREQCOUNT; i++){
+		if ((cpuvoltage[i]-tmptable[i]) > CPUMVMAX || (cpuvoltage[i]-tmptable[i]) < CPUMVMIN) // Keep within constraints
+			return -EINVAL;
+		else
+			cpuuvoffset[i] = tmptable[i];
+	}
 	return count;
 }
-#endif
 
 cpufreq_freq_attr_ro_perm(cpuinfo_cur_freq, 0400);
 cpufreq_freq_attr_ro(cpuinfo_min_freq);
 cpufreq_freq_attr_ro(cpuinfo_max_freq);
+cpufreq_freq_attr_ro(cpuinfo_min_mV);
+cpufreq_freq_attr_ro(cpuinfo_max_mV);
 cpufreq_freq_attr_ro(cpuinfo_transition_latency);
 cpufreq_freq_attr_ro(scaling_available_governors);
 cpufreq_freq_attr_ro(scaling_driver);
@@ -748,37 +750,34 @@ cpufreq_freq_attr_ro(scaling_cur_freq);
 cpufreq_freq_attr_ro(bios_limit);
 cpufreq_freq_attr_ro(related_cpus);
 cpufreq_freq_attr_ro(affected_cpus);
+cpufreq_freq_attr_ro(frequency_voltage_table);
 cpufreq_freq_attr_rw(scaling_min_freq);
 cpufreq_freq_attr_rw(scaling_max_freq);
 cpufreq_freq_attr_rw(scaling_governor);
 cpufreq_freq_attr_rw(scaling_setspeed);
+cpufreq_freq_attr_rw(UV_mV_table);
 cpufreq_freq_attr_ro(policy_min_freq);
 cpufreq_freq_attr_ro(policy_max_freq);
-
-#ifdef CONFIG_TEGRA_UVOV
-cpufreq_freq_attr_ro(frequency_voltage_table);
-cpufreq_freq_attr_rw(UV_mV_table);
-#endif
 
 static struct attribute *default_attrs[] = {
 	&cpuinfo_min_freq.attr,
 	&cpuinfo_max_freq.attr,
+	&cpuinfo_min_mV.attr,
+	&cpuinfo_max_mV.attr,
 	&cpuinfo_transition_latency.attr,
 	&scaling_min_freq.attr,
 	&scaling_max_freq.attr,
 	&affected_cpus.attr,
 	&related_cpus.attr,
+	&frequency_voltage_table.attr,
 	&scaling_governor.attr,
 	&scaling_driver.attr,
 	&scaling_available_governors.attr,
 	&scaling_setspeed.attr,
+	&UV_mV_table.attr,
 	&policy_min_freq.attr,
 	&policy_max_freq.attr,
 
-#ifdef CONFIG_TEGRA_UVOV
-	&frequency_voltage_table.attr,
-	&UV_mV_table.attr,
-#endif
 	NULL
 };
 
@@ -1107,18 +1106,26 @@ static int cpufreq_add_dev(struct sys_device *sys_dev)
 
 	/* Set governor before ->init, so that driver could check it */
 #ifdef CONFIG_HOTPLUG_CPU
+	struct cpufreq_policy *cp;
 	for_each_online_cpu(sibling) {
-		struct cpufreq_policy *cp = per_cpu(cpufreq_cpu_data, sibling);
+		cp = per_cpu(cpufreq_cpu_data, sibling);
 		if (cp && cp->governor &&
 		    (cpumask_test_cpu(cpu, cp->related_cpus))) {
+			dprintk("found sibling CPU, copying policy\n");
 			policy->governor = cp->governor;
+			policy->min = cp->min;
+			policy->max = cp->max;
+			policy->user_policy.min = cp->user_policy.min;
+			policy->user_policy.max = cp->user_policy.max;
 			found = 1;
 			break;
 		}
 	}
 #endif
-	if (!found)
+	if (!found){
+		dprintk("failed to find sibling CPU, falling back to defaults\n");
 		policy->governor = CPUFREQ_DEFAULT_GOVERNOR;
+	}
 	/* call driver. From then on the cpufreq must be able
 	 * to accept all calls to ->verify and ->setpolicy for this CPU
 	 */
@@ -1129,6 +1136,15 @@ static int cpufreq_add_dev(struct sys_device *sys_dev)
 	}
 	policy->user_policy.min = policy->min;
 	policy->user_policy.max = policy->max;
+
+	if (found){
+		/* Calling the driver can overwrite policy frequencies again */
+		dprintk("Overriding policy max and min with sibling settings\n");
+		policy->min = cp->min;
+		policy->max = cp->max;
+		policy->user_policy.min = cp->user_policy.min;
+		policy->user_policy.max = cp->user_policy.max;
+	}
 
 	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
 				     CPUFREQ_START, policy);
@@ -2081,11 +2097,6 @@ EXPORT_SYMBOL_GPL(cpufreq_unregister_driver);
 static int __init cpufreq_core_init(void)
 {
 	int cpu;
-
-#ifdef CONFIG_TEGRA_UVOV
-	/* Allocate some memory for the voltage tab */
-	UV_mV_Ptr = kzalloc(sizeof(int)*(MAX_DVFS_FREQS), GFP_KERNEL);
-#endif
 
 	for_each_possible_cpu(cpu) {
 		per_cpu(cpufreq_policy_cpu, cpu) = -1;

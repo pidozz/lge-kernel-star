@@ -340,11 +340,12 @@ CHECK		= sparse
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 
-CFLAGS_MODULE   = -O3 -fomit-frame-pointer -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math
-AFLAGS_MODULE   = -O3 -fomit-frame-pointer -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math
+MODFLAGS	= -DMODULE -O2 -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -mthumb-interwork
+CFLAGS_MODULE   = $(MODFLAGS)
+AFLAGS_MODULE   = $(MODFLAGS)
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -O3 -fomit-frame-pointer -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions
-AFLAGS_KERNEL	= -O3 -fomit-frame-pointer -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions
+CFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm
+AFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 # Use LINUXINCLUDE when you must reference the include/ directory.

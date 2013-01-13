@@ -71,9 +71,9 @@ EXTRA_CFLAGS = \
 	-DMMC_SDIO_ABORT \
 	-DGET_CUSTOM_MAC_ENABLE \
 	-DCONFIG_FIRST_SCAN \
-	-DCSCAN \
 
 #	\
+	-DCSCAN \
 	-fshort-wchar \
 	-D__KERNEL__ \
 	-Iinclude \

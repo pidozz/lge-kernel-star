@@ -37,26 +37,23 @@
 						"cpufreq-core", msg)
 
 /* Initial implementation of userspace voltage control */
-#ifdef CONFIG_TEGRA_MAX
-	#define FREQCOUNT 12
+#ifdef CONFIG_TEGRA_OC
+#define FREQCOUNT 10
 #else
-	#define FREQCOUNT 10
+#define FREQCOUNT 8
 #endif
 
-#define CPUMVMAX 1400
-#define CPUMVMIN 770
+#define CPUMVMAX 1175
+#define CPUMVMIN 750
 
-#ifdef CONFIG_TEGRA_MAX
-int cpufrequency[FREQCOUNT] = { 1408000, 1300000, 1200000, 1000000, 912000, 816000, 760000, 750000, 608000, 456000, 312000, 216000 };
+#ifdef CONFIG_TEGRA_OC
+int cpufrequency[FREQCOUNT] = { 1200000, 1100000, 1000000, 912000, 816000, 760000, 608000, 456000, 312000, 216000 };
+int cpuvoltage[FREQCOUNT] = { 1175, 1100, 1050, 975, 925, 900, 850, 800, 775, 750 };
 #else
-int cpufrequency[FREQCOUNT] = { 1200000, 1000000, 912000, 816000, 760000, 750000, 608000, 456000, 312000, 216000 };
+int cpufrequency[FREQCOUNT] = { 1000000, 912000, 816000, 760000, 608000, 456000, 312000, 216000 };
+int cpuvoltage[FREQCOUNT] = { 1025, 1000, 925, 900, 850, 800, 775, 750 };
 #endif
 
-#ifdef CONFIG_TEGRA_MAX
-int cpuvoltage[FREQCOUNT] = { 1325, 1250, 1175, 1000, 950, 925, 900, 900, 875, 825, 775, 750 };
-#else
-int cpuvoltage[FREQCOUNT] = { 1175, 1000, 950, 925, 900, 900, 875, 825, 775, 750 };
-#endif
 int cpuuvoffset[FREQCOUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**

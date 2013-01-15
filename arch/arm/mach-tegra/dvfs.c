@@ -40,7 +40,11 @@
 #include "clock.h"
 #include "dvfs.h"
 
-#define FREQCOUNT 13
+#ifdef CONFIG_TEGRA_OC
+#define FREQCOUNT 10
+#else
+#define FREQCOUNT 8
+#endif
 extern int cpufrequency[FREQCOUNT];
 extern int cpuuvoffset[FREQCOUNT];
 

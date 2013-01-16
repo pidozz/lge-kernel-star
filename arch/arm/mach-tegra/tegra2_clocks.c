@@ -1960,13 +1960,7 @@ static struct clk_pll_freq_table tegra_pll_x_freq_table[] = {
 	{ 13000000, 1200000000, 923, 10, 1, 12},
 	{ 19200000, 1200000000, 750, 12, 1, 8},
 	{ 26000000, 1200000000, 600, 13, 1, 12},
-#ifdef CONFIG_TEGRA_OC
-	/* 1.1 GHz */
-	{ 12000000, 1100000000, 620, 12,  1, 12},
-	{ 13000000, 1100000000, 943, 13, 1, 12},
-	{ 19200000, 1100000000, 770, 12, 1, 8},
-	{ 26000000, 1100000000, 620, 26, 1, 12},
-#endif
+
 	/* 1 GHz */
 	{ 12000000, 1000000000, 1000, 12, 1, 12},
 	{ 13000000, 1000000000, 1000, 13, 1, 12},
@@ -2713,14 +2707,8 @@ static struct cpufreq_frequency_table freq_table_1p2GHz[] = {
 	{ 5, 816000 },
 	{ 6, 912000 },
 	{ 7, 1000000 },
-#ifdef CONFIG_TEGRA_OC
-	{ 8, 1100000 },
-	{ 9, 1200000 },
-	{ 10, CPUFREQ_TABLE_END },
-#else
 	{ 8, 1200000 },
 	{ 9, CPUFREQ_TABLE_END },
-#endif
 };
 
 static struct tegra_cpufreq_table_data cpufreq_tables[] = {
@@ -2778,6 +2766,8 @@ static int tegra_clk_suspend(void)
 		return 0;
 
 	*ctx++ = clk_readl(OSC_CTRL) & OSC_CTRL_MASK;
+	*ctx++ = clk_readl(tegra_pll_p_out1.reg);
+	*ctx++ = clk_readl(tegra_pll_p_out3.reg);
 	*ctx++ = clk_readl(tegra_pll_c.reg + PLL_BASE);
 	*ctx++ = clk_readl(tegra_pll_c.reg + PLL_MISC(&tegra_pll_c));
 	*ctx++ = clk_readl(tegra_pll_a.reg + PLL_BASE);
@@ -2830,6 +2820,8 @@ static void tegra_clk_resume(void)
 	unsigned long off, i;
 	const u32 *ctx = clk_rst_suspend;
 	u32 val;
+	u32 pll_p_out12, pll_p_out34;
+	u32 pll_m_out1, pll_a_out0, pll_c_out1;
 
 	if (tegra_get_current_suspend_mode() != TEGRA_SUSPEND_LP0)
 		return;
@@ -2844,6 +2836,13 @@ static void tegra_clk_resume(void)
 	 * pllp, and pllu are already configured and enabled.
 	 */
 
+
+	val = PLL_OUT_CLKEN | PLL_OUT_RESET_DISABLE;
+	val |= val << 16;
+	pll_p_out12 = *ctx++;
+	clk_writel(pll_p_out12 | val, tegra_pll_p_out1.reg);
+	pll_p_out34 = *ctx++;
+	clk_writel(pll_p_out34 | val, tegra_pll_p_out3.reg);
 	clk_writel(*ctx++, tegra_pll_c.reg + PLL_BASE);
 	clk_writel(*ctx++, tegra_pll_c.reg + PLL_MISC(&tegra_pll_c));
 	clk_writel(*ctx++, tegra_pll_a.reg + PLL_BASE);
@@ -2856,9 +2855,13 @@ static void tegra_clk_resume(void)
 	clk_writel(*ctx++, tegra_pll_u.reg + PLL_MISC(&tegra_pll_u));
 	udelay(1000);
 
-	clk_writel(*ctx++, tegra_pll_m_out1.reg);
-	clk_writel(*ctx++, tegra_pll_a_out0.reg);
-	clk_writel(*ctx++, tegra_pll_c_out1.reg);
+	val = PLL_OUT_CLKEN | PLL_OUT_RESET_DISABLE;
+	pll_m_out1 = *ctx++;
+	clk_writel(pll_m_out1 | val, tegra_pll_m_out1.reg);
+	pll_a_out0 = *ctx++;
+	clk_writel(pll_a_out0 | val, tegra_pll_a_out0.reg);
+	pll_c_out1 = *ctx++;
+	clk_writel(pll_c_out1 | val, tegra_pll_c_out1.reg);
 
 	clk_writel(*ctx++, tegra_clk_cclk.reg);
 	clk_writel(*ctx++, tegra_clk_cclk.reg + SUPER_CLK_DIVIDER);
@@ -2895,6 +2898,13 @@ static void tegra_clk_resume(void)
 
 	clk_writel(*ctx++, MISC_CLK_ENB);
 	clk_writel(*ctx++, CLK_MASK_ARM);
+
+	/* Restore back the actual pll and secondary divider values */
+	clk_writel(pll_p_out12, tegra_pll_p_out1.reg);
+	clk_writel(pll_p_out34, tegra_pll_p_out3.reg);
+	clk_writel(pll_m_out1, tegra_pll_m_out1.reg);
+	clk_writel(pll_a_out0, tegra_pll_a_out0.reg);
+	clk_writel(pll_c_out1, tegra_pll_c_out1.reg);
 }
 
 #else

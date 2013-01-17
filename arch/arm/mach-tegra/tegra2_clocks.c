@@ -1961,11 +1961,11 @@ static struct clk_pll_freq_table tegra_pll_x_freq_table[] = {
 	{ 19200000, 1200000000, 750, 12, 1, 8},
 	{ 26000000, 1200000000, 600, 13, 1, 12},
 
-#ifdef CONFIG_TEGRA_OC
+#ifdef CONFIG_TEGRA_TESTOC
 	/* 1.1 GHz */
 	{ 12000000, 1100000000, 550, 6,  1, 12},
-	{ 13000000, 1100000000, 923, 10, 1, 12},
-	{ 19200000, 1100000000, 750, 12, 1, 8},
+	{ 13000000, 1100000000, 770, 10, 1, 12},
+	{ 19200000, 1100000000, 630, 12, 1, 8},
 	{ 26000000, 1100000000, 550, 13, 1, 12},
 #endif
 
@@ -2468,7 +2468,12 @@ struct clk tegra_list_periph_clks[] = {
 #endif
 	PERIPH_CLK("vi",	"tegra_camera",		"vi",	20,	0x148,	0x31E,	150000000, mux_pllm_pllc_pllp_plla,	MUX | DIV_U71), /* scales with voltage and process_id */
 	PERIPH_CLK("vi_sensor",	"tegra_camera",		"vi_sensor",	20,	0x1a8,	0x31E,	150000000, mux_pllm_pllc_pllp_plla,	MUX | DIV_U71 | PERIPH_NO_RESET), /* scales with voltage and process_id */
+
+#ifdef CONIG_TEGRA_OC
+	PERIPH_CLK("epp",	"epp",			NULL,	19,	0x16c,	0x31E,	350000000, mux_pllm_pllc_pllp_plla,	MUX | DIV_U71), /* scales with voltage and process_id */
+#else
 	PERIPH_CLK("epp",	"epp",			NULL,	19,	0x16c,	0x31E,	300000000, mux_pllm_pllc_pllp_plla,	MUX | DIV_U71), /* scales with voltage and process_id */
+#endif
 	PERIPH_CLK("mpe",	"mpe",			NULL,	60,	0x170,	0x31E,	300000000, mux_pllm_pllc_pllp_plla,	MUX | DIV_U71), /* scales with voltage and process_id */
 	PERIPH_CLK("host1x",	"host1x",		NULL,	28,	0x180,	0x31E,	166000000, mux_pllm_pllc_pllp_plla,	MUX | DIV_U71), /* scales with voltage and process_id */
 	PERIPH_CLK("cve",	"cve",			NULL,	49,	0x140,	0x31E,	250000000, mux_pllp_plld_pllc_clkm,	MUX | DIV_U71), /* requires min voltage */
@@ -2684,6 +2689,23 @@ static void tegra2_init_one_clock(struct clk *c)
  * must be ascending.
  */
 
+#ifdef CONFIG_TEGRA_OC
+static struct cpufreq_frequency_table freq_table_456MHz[] = {
+	{ 0, 216000 },
+	{ 1, 312000 },
+	{ 2, 456000 },
+	{ 3, CPUFREQ_TABLE_END },
+};
+
+static struct cpufreq_frequency_table freq_table_608MHz[] = {
+	{ 0, 216000 },
+	{ 1, 312000 },
+	{ 2, 456000 },
+	{ 3, 608000 },
+	{ 4, CPUFREQ_TABLE_END },
+};
+#endif
+
 static struct cpufreq_frequency_table freq_table_750MHz[] = {
 	{ 0, 216000 },
 	{ 1, 312000 },
@@ -2706,7 +2728,7 @@ static struct cpufreq_frequency_table freq_table_1p0GHz[] = {
 	{ 8, CPUFREQ_TABLE_END },
 };
 
-#ifdef CONFIG_TEGRA_OC
+#ifdef CONFIG_TEGRA_TESTOC
 static struct cpufreq_frequency_table freq_table_1p2GHz[] = {
 	{ 0, 216000 },
 	{ 1, 312000 },
@@ -2735,11 +2757,21 @@ static struct cpufreq_frequency_table freq_table_1p2GHz[] = {
 };
 #endif
 
+#ifdef CONFIG_TEGRA_OC
+static struct tegra_cpufreq_table_data cpufreq_tables[] = {
+	{ freq_table_456MHz, 1, 2, 2 },  
+	{ freq_table_608MHz, 1, 3, 2 },
+	{ freq_table_750MHz, 1, 4, 3 },
+	{ freq_table_1p0GHz, 2, 6, 5 },
+	{ freq_table_1p2GHz, 2, 7, 6 },
+};
+#else
 static struct tegra_cpufreq_table_data cpufreq_tables[] = {
 	{ freq_table_750MHz, 1, 4 },
 	{ freq_table_1p0GHz, 2, 6 },
 	{ freq_table_1p2GHz, 2, 7 },
 };
+#endif
 
 struct tegra_cpufreq_table_data *tegra_cpufreq_table_get(void)
 {
@@ -2763,7 +2795,7 @@ unsigned long tegra_emc_to_cpu_ratio(unsigned long cpu_rate)
 {
 	/* Vote on memory bus frequency based on cpu frequency */
 	if (cpu_rate > 1000000000)
-		return 760000000;
+		return 600000000;	/* was 760000000;  */
 	else if (cpu_rate >= 816000)
 		return 600000000;	/* cpu 816 MHz, emc max */
 	else if (cpu_rate >= 608000)

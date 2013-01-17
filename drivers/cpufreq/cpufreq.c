@@ -51,7 +51,7 @@ int cpufrequency[FREQCOUNT] = { 1200000, 1100000, 1000000, 912000, 816000, 76000
 int cpuvoltage[FREQCOUNT] = { 1175, 1100, 1050, 975, 925, 900, 850, 800, 775, 750 };
 #else
 int cpufrequency[FREQCOUNT] = { 1000000, 912000, 816000, 760000, 608000, 456000, 312000, 216000 };
-int cpuvoltage[FREQCOUNT] = { 1025, 1000, 925, 900, 850, 800, 775, 750 };
+int cpuvoltage[FREQCOUNT] = { 1050, 975, 925, 900, 850, 800, 775, 750 };
 #endif
 
 int cpuuvoffset[FREQCOUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };

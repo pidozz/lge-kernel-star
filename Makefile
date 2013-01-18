@@ -344,8 +344,8 @@ MODFLAGS	= -DMODULE -O2 -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftr
 CFLAGS_MODULE   = $(MODFLAGS)
 AFLAGS_MODULE   = $(MODFLAGS)
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm
-AFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm
+CFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -fsingle-precision-constant -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm
+AFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -fsingle-precision-constant -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 # Use LINUXINCLUDE when you must reference the include/ directory.

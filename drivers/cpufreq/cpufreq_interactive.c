@@ -40,6 +40,8 @@ extern void hotplug_boostpulse(void);
 
 /* Default boostpulse frequency */
 #define DEFAULT_BOOSTPULSE_FREQ 1000000
+/* Default boostpulse duration */
+#define DEFAULT_BOOSTPULSE_DURATION (40 * USEC_PER_MSEC)
 
 struct cpufreq_interactive_cpuinfo {
 	struct timer_list cpu_timer;
@@ -103,7 +105,7 @@ static unsigned long above_hispeed_delay_val = DEFAULT_ABOVE_HISPEED_DELAY;
 /* Non-zero means indefinite speed boost active */
 static int boost_val = 0;
 /* Duration of a boot pulse in usecs */
-static int boostpulse_duration_val = DEFAULT_MIN_SAMPLE_TIME;
+static int boostpulse_duration_val = DEFAULT_BOOSTPULSE_DURATION;
 /* End time of boost pulse in ktime converted to usecs */
 static u64 boostpulse_endtime;
 

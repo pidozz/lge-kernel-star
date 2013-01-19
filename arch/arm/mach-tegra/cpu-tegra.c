@@ -593,7 +593,11 @@ void tegra_cpu_lock_speed(unsigned long min_rate, unsigned long max_rate, int ti
 		if (sku_id == 0x17)
 			max_cpulock_freq = 1200000;	//AP25
 		else
+		#ifdef CONFIG_TEGRA_OC
+			max_cpulock_freq = 1200000;	//AP20 OC 1.2Ghz
+		#else
 			max_cpulock_freq = 1000000;	//AP20
+		#endif
 	}
 	
 	is_cpufreq_locked = true;
@@ -626,7 +630,11 @@ void tegra_cpu_unlock_speed(void)
 	if (sku_id == 0x17)
 		max_cpulock_freq = 1200000; //AP25
 	else
-		max_cpulock_freq = 1000000;	//AP20
+		#ifdef CONFIG_TEGRA_OC
+			max_cpulock_freq = 1200000;	//AP20 OC 1.2Ghz
+		#else
+			max_cpulock_freq = 1000000;	//AP20
+		#endif
 
 	is_cpufreq_locked = false;
 	hrtimer_cancel(&cpulock_timer);
@@ -644,7 +652,11 @@ static enum hrtimer_restart tegra_cpulock_timer_func(struct hrtimer *timer)
 	if (sku_id == 0x17)
 		max_cpulock_freq = 1200000; //AP25
 	else
-		max_cpulock_freq = 1000000;	//AP20
+		#ifdef CONFIG_TEGRA_OC
+			max_cpulock_freq = 1200000;	//AP20 OC 1.2Ghz
+		#else
+			max_cpulock_freq = 1000000;	//AP20
+		#endif
 
 	is_cpufreq_locked = false;
 	printk(KERN_DEBUG "%s is called\n", __func__);

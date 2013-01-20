@@ -193,7 +193,8 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 export KBUILD_BUILDHOST := $(SUBARCH)
 ARCH		?= arm
-CROSS_COMPILE	?= $(HOME)/cm10/prebuilt/linux-x86/toolchain/arm-symbi0sis-linux-gnueabi/bin/arm-symbi0sis-
+CROSS_COMPILE	?= $(HOME)/cm10/prebuilt/linux-x86/toolchain/android-toolchain-eabi/bin/arm-eabi-
+# $(HOME)/cm10/prebuilt/linux-x86/toolchain/arm-symbi0sis-linux-gnueabi/bin/arm-symbi0sis-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -340,12 +341,12 @@ CHECK		= sparse
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 
-MODFLAGS	= -DMODULE -O2 -mtune=cortex-a9 -mfloat-abi=softfp -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -mthumb-interwork
-CFLAGS_MODULE   = $(MODFLAGS)
-AFLAGS_MODULE   = $(MODFLAGS)
+
+CFLAGS_MODULE   = 
+AFLAGS_MODULE   = 
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -fsingle-precision-constant -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm
-AFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -fsingle-precision-constant -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm
+CFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm -fomit-frame-pointer
+AFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm -fomit-frame-pointer
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
@@ -360,7 +361,8 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
 		   -Wno-format-security \
-		   -fno-delete-null-pointer-checks
+		   -fno-delete-null-pointer-checks \
+		   
 		   
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=

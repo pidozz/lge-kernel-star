@@ -2681,23 +2681,6 @@ static void tegra2_init_one_clock(struct clk *c)
  * must be ascending.
  */
 
-#ifdef CONFIG_TEGRA_OC
-static struct cpufreq_frequency_table freq_table_456MHz[] = {
-	{ 0, 216000 },
-	{ 1, 312000 },
-	{ 2, 456000 },
-	{ 3, CPUFREQ_TABLE_END },
-};
-
-static struct cpufreq_frequency_table freq_table_608MHz[] = {
-	{ 0, 216000 },
-	{ 1, 312000 },
-	{ 2, 456000 },
-	{ 3, 608000 },
-	{ 4, CPUFREQ_TABLE_END },
-};
-#endif
-
 static struct cpufreq_frequency_table freq_table_750MHz[] = {
 	{ 0, 216000 },
 	{ 1, 312000 },
@@ -2749,21 +2732,11 @@ static struct cpufreq_frequency_table freq_table_1p2GHz[] = {
 };
 #endif
 
-#ifdef CONFIG_TEGRA_OC
-static struct tegra_cpufreq_table_data cpufreq_tables[] = {
-	{ freq_table_456MHz, 1, 2, 2 },  
-	{ freq_table_608MHz, 1, 3, 2 },
-	{ freq_table_750MHz, 1, 4, 3 },
-	{ freq_table_1p0GHz, 2, 6, 5 },
-	{ freq_table_1p2GHz, 2, 7, 6 },
-};
-#else
 static struct tegra_cpufreq_table_data cpufreq_tables[] = {
 	{ freq_table_750MHz, 1, 4 },
 	{ freq_table_1p0GHz, 2, 6 },
 	{ freq_table_1p2GHz, 2, 7 },
 };
-#endif
 
 struct tegra_cpufreq_table_data *tegra_cpufreq_table_get(void)
 {

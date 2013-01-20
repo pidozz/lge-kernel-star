@@ -49,12 +49,12 @@
 #ifdef CONFIG_TEGRA_OC
 int cpufrequency[FREQCOUNT] = { 1200000, 1100000, 1000000, 912000, 816000, 760000, 608000, 456000, 312000, 216000 };
 int cpuvoltage[FREQCOUNT] = { 1175, 1075, 1000, 950, 950, 875, 850, 800, 775, 750 };
+int cpuuvoffset[FREQCOUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #else
 int cpufrequency[FREQCOUNT] = { 1000000, 912000, 816000, 760000, 608000, 456000, 312000, 216000 };
 int cpuvoltage[FREQCOUNT] = { 1000, 950, 950, 875, 850, 800, 775, 750 };
+int cpuuvoffset[FREQCOUNT] = { 0, 0, 0, 0, 0, 0, 0, 0};
 #endif
-
-int cpuuvoffset[FREQCOUNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 /**
  * The "cpufreq driver" - the arch- or hardware-dependent low
@@ -723,7 +723,11 @@ static ssize_t store_UV_mV_table(struct cpufreq_policy *policy, char *buf, size_
 {
 	int tmptable[FREQCOUNT];
 	int i;
-	unsigned int ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d %d %d", &tmptable[0], &tmptable[1], &tmptable[2], &tmptable[3], &tmptable[4], &tmptable[5], &tmptable[6], &tmptable[7], &tmptable[8], &tmptable[9], &tmptable[10], &tmptable[11], &tmptable[12]);
+#ifdef CONFIG_TEGRA_OC
+	unsigned int ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d", &tmptable[0], &tmptable[1], &tmptable[2], &tmptable[3], &tmptable[4], &tmptable[5], &tmptable[6], &tmptable[7], &tmptable[8], &tmptable[9], &tmptable[10]);
+#else
+	unsigned int ret = sscanf(buf, "%d %d %d %d %d %d %d %d", &tmptable[0], &tmptable[1], &tmptable[2], &tmptable[3], &tmptable[4], &tmptable[5], &tmptable[6], &tmptable[7], &tmptable[8]);
+#endif
 	if (ret != FREQCOUNT)
 		return -EINVAL;
 	for (i = 0; i < FREQCOUNT; i++){

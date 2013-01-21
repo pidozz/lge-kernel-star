@@ -345,8 +345,8 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 CFLAGS_MODULE   = 
 AFLAGS_MODULE   = 
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm -fomit-frame-pointer
-AFLAGS_KERNEL	= -O3 -funswitch-loops -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -ftree-vectorize -ffast-math -fno-inline-functions -funroll-loops -marm -fomit-frame-pointer
+CFLAGS_KERNEL	= -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -ffast-math -ftree-loop-linear -floop-strip-mine -floop-block -fgraphite-identity -floop-parallelize-all -ftree-loop-distribution -marm
+AFLAGS_KERNEL	= -O3 -funroll-loops -march=armv7-a -mtune=cortex-a9 -mcpu=cortex-a9 -mfloat-abi=softfp -msoft-float -mfpu=vfpv3-d16 -ffast-math -ftree-loop-linear -floop-strip-mine -floop-block -fgraphite-identity -floop-parallelize-all -ftree-loop-distribution -marm
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
 # Use LINUXINCLUDE when you must reference the include/ directory.

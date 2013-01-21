@@ -90,6 +90,12 @@ config ANDROID_LOW_MEMORY_KILLER
 	---help---
 	  Register processes to be killed when memory is low
 
+config ANDROID_LOW_MEMORY_KILLER_AUTODETECT_OOM_ADJ_VALUES
+	bool "Android LMK autodetect OOM ADJ values"
+	default N
+	---help---
+	  Autodetect LMK values
+
 endif # if ANDROID
 
 endmenu

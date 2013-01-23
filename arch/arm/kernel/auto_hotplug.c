@@ -65,8 +65,8 @@
  */
 
 #define DEFAULT_ENABLE_ALL_LOAD_THRESHOLD	(125 * CPUS_AVAILABLE)
-#define DEFAULT_ENABLE_LOAD_THRESHOLD		225
-#define DEFAULT_DISABLE_LOAD_THRESHOLD		105
+#define DEFAULT_ENABLE_LOAD_THRESHOLD		200
+#define DEFAULT_DISABLE_LOAD_THRESHOLD		80
 
 /* Control flags */
 unsigned char flags;
@@ -437,7 +437,7 @@ static void __cpuinit hotplug_online_all_work_fn(struct work_struct *work)
 	/*
 	 * Pause for 2 seconds before even considering offlining a CPU
 	 */
-	schedule_delayed_work(&hotplug_unpause_work, HZ * 2);
+	schedule_delayed_work(&hotplug_unpause_work, HZ * 5);
 	schedule_delayed_work_on(0, &hotplug_decision_work, min_sampling_rate);
 }
 
@@ -530,7 +530,7 @@ void hotplug_boostpulse(void)
 			cancel_delayed_work_sync(&hotplug_offline_work);
 			flags |= HOTPLUG_PAUSED;
 			schedule_work(&hotplug_online_single_work);
-			schedule_delayed_work(&hotplug_unpause_work, HZ);
+			schedule_delayed_work(&hotplug_unpause_work, HZ * 5);
 		} else {
 			if (debug)
 				pr_info("auto_hotplug: %s: %d CPUs online\n", __func__, num_online_cpus());
@@ -539,7 +539,7 @@ void hotplug_boostpulse(void)
 					pr_info("auto_hotplug: %s: Canceling hotplug_offline_work\n", __func__);
 				cancel_delayed_work(&hotplug_offline_work);
 				flags |= HOTPLUG_PAUSED;
-				schedule_delayed_work(&hotplug_unpause_work, HZ * 2);
+				schedule_delayed_work(&hotplug_unpause_work, HZ * 5);
 				schedule_delayed_work_on(0, &hotplug_decision_work, min_sampling_rate);
 			}
 		}

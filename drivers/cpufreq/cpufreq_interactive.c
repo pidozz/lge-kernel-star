@@ -833,21 +833,24 @@ static ssize_t store_boost(struct kobject *kobj, struct attribute *attr,
 
 define_one_global_rw(boost);
 
-inline void boostpulse(void)
+static ssize_t store_boostpulse(struct kobject *kobj, struct attribute *attr,
+				const char *buf, size_t count)
 {
-	struct cpufreq_interactive_cpuinfo *pcpu;
-	unsigned int cur_freq;
-	pcpu = &per_cpu(cpuinfo, 0);
-  	cur_freq = pcpu->policy->cur;
-  
-	if (cur_freq >= hispeed_freq)
-    		return;
-  	else {  
-    		boostpulse_endtime = ktime_to_us(ktime_get()) + boostpulse_duration_val;
-    		trace_cpufreq_interactive_boost("pulse");
-    		cpufreq_interactive_boost();
- 	}
+	int ret;
+	unsigned long val;
+
+	ret = kstrtoul(buf, 0, &val);
+	if (ret < 0)
+		return ret;
+
+	boostpulse_endtime = ktime_to_us(ktime_get()) + boostpulse_duration_val;
+	trace_cpufreq_interactive_boost("pulse");
+	cpufreq_interactive_boost();
+	return count;
 }
+
+static struct global_attr boostpulse =
+	__ATTR(boostpulse, 0200, NULL, store_boostpulse);
 
 static ssize_t show_boostpulse_duration(
 	struct kobject *kobj, struct attribute *attr, char *buf)
@@ -881,6 +884,7 @@ static struct attribute *interactive_attributes[] = {
 	&timer_rate_attr.attr,
 	&timer_slack.attr,
 	&boost.attr,
+	&boostpulse.attr,
 	&boostpulse_duration.attr,
 	NULL,
 };
